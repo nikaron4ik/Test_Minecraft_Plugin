@@ -1,5 +1,8 @@
+D:\JavaProjects\PluginTest\src\main\java\me\nikaron4ik\testPlugin\Events\BlockBreakListener.java
+D:\JavaProjects\PluginTest\src\main\java\me\nikaron4ik\testPlugin\Events\BlockPlaceListener.java
 D:\JavaProjects\PluginTest\src\main\java\me\nikaron4ik\testPlugin\Events\BreakingGrassOrDirtEvent.java
 D:\JavaProjects\PluginTest\src\main\java\me\nikaron4ik\testPlugin\Events\DamageZombieListener.java
+D:\JavaProjects\PluginTest\src\main\java\me\nikaron4ik\testPlugin\Events\EntitiesDeathEvent.java
 D:\JavaProjects\PluginTest\src\main\java\me\nikaron4ik\testPlugin\Events\JoinEvent.java
 D:\JavaProjects\PluginTest\src\main\java\me\nikaron4ik\testPlugin\Main.java
 D:\JavaProjects\PluginTest\src\main\java\me\nikaron4ik\testPlugin\utils\Utils.java

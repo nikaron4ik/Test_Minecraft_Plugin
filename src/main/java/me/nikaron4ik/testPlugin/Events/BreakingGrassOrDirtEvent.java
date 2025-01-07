@@ -1,11 +1,18 @@
 package me.nikaron4ik.testPlugin.Events;
 
-import io.papermc.paper.event.block.BlockBreakBlockEvent;
-import me.nikaron4ik.testPlugin.Main;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -16,7 +23,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 public class BreakingGrassOrDirtEvent implements Listener {
-
     private final JavaPlugin plugin;
 
     public BreakingGrassOrDirtEvent(JavaPlugin plugin) {
@@ -27,73 +33,48 @@ public class BreakingGrassOrDirtEvent implements Listener {
     public void onBreackingBlock(BlockBreakEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
-
         Block block = event.getBlock();
         Material BlockType = block.getType();
-
-        // Корректное вычисление позиции игрока и направления взгляда L
         Location playerLocation = player.getLocation();
         Vector direction = player.getEyeLocation().getDirection();
-
-
-
-        // 2 задание (с овцой)
         if (BlockType == Material.GRASS_BLOCK || BlockType == Material.DIRT) {
-            Sheep sheep = (Sheep) world.spawnEntity(block.getLocation().add(0, 0, 1), EntityType.SHEEP);
+            Sheep sheep = (Sheep)world.spawnEntity(block.getLocation().add((double)0.0F, (double)0.0F, (double)1.0F), EntityType.SHEEP);
             sheep.setColor(DyeColor.PURPLE);
-            player.sendMessage(ChatColor.WHITE + "Сломал траву или землю? - ДЕРЖИ ОВЕЧКУ!");
+            player.sendMessage(String.valueOf(ChatColor.WHITE) + "Сломал траву или землю? - ДЕРЖИ ОВЕЧКУ!");
         }
-        // 3 задание (с зомби)
+
         if (BlockType == Material.STONE | BlockType == Material.COBBLESTONE) {
-
-            // Запускаем таймер до спавна зомби в чате
-            for (int i = 5; i > 0; i--) {
-                int countdown = i;
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    event.getPlayer().sendMessage(ChatColor.GREEN + "До спавна зомби осталось: " + countdown + " секунд");
-                }, 20 * (5 - countdown));
+            for(int i = 5; i > 0; --i) {
+                int finalI = i;
+                Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+                    Player var10000 = event.getPlayer();
+                    String var10001 = String.valueOf(ChatColor.GREEN);
+                    var10000.sendMessage(var10001 + "До спавна зомби осталось: " + finalI + " секунд");
+                }, (long)(20 * (5 - i)));
             }
 
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+                Location newPlayerLocation = event.getPlayer().getLocation();
+                Vector newDirection = newPlayerLocation.getDirection();
+                Location spawnLocation = newPlayerLocation.add(newDirection.multiply(3)).clone();
+                Zombie zombie = (Zombie) world.spawnEntity(spawnLocation, EntityType.ZOMBIE);
+                zombie.setCustomName(String.valueOf(ChatColor.YELLOW) + "Убейте меня пожалуйста");
+                zombie.setCustomNameVisible(true);
+                zombie.getPersistentDataContainer().set(new NamespacedKey(this.plugin, "special_zombie"), PersistentDataType.BYTE, (byte)1);
+                ItemStack[] ZombieArmor = new ItemStack[]{new ItemStack(Material.LEATHER_HELMET), new ItemStack(Material.LEATHER_CHESTPLATE), new ItemStack(Material.LEATHER_LEGGINGS), new ItemStack(Material.LEATHER_BOOTS)};
 
-            // Узнаём позицию игрока в момент спавна, чтобы заспавнить моба прямо перед ним
-            Location newPlayerLocation = event.getPlayer().getLocation();
-            Vector newDirection = newPlayerLocation.getDirection();
-            Location spawnLocation = newPlayerLocation.add(newDirection.multiply(3)).clone();
+                for(ItemStack armoritem : ZombieArmor) {
+                    LeatherArmorMeta armmeta = (LeatherArmorMeta)armoritem.getItemMeta();
+                    armmeta.setColor(Color.YELLOW);
+                    armoritem.setItemMeta(armmeta);
+                }
 
-
-            Zombie zombie = (Zombie) world.spawnEntity(spawnLocation, EntityType.ZOMBIE);
-
-            // Установки имени для зомби
-            zombie.setCustomName(ChatColor.YELLOW + "Убейте меня пожалуйста");
-            zombie.setCustomNameVisible(true);
-
-            // Создаём "идентификатор" для зомби, которые спавнятся через блоки, чтобы наносимый урон показывался только для них
-            zombie.getPersistentDataContainer().set(new NamespacedKey(plugin, "special_zombie"), PersistentDataType.BYTE, (byte) 1);
-
-            //Создание брони для зомби
-            ItemStack[] ZombieArmor = new ItemStack[ ]{
-                    new ItemStack(Material.LEATHER_HELMET),
-                    new ItemStack(Material.LEATHER_CHESTPLATE),
-                    new ItemStack(Material.LEATHER_LEGGINGS),
-                    new ItemStack(Material.LEATHER_BOOTS),
-            };
-
-            // Создание мета-данных для каждого элемента брони, чтобы можно было изменять их цвет (????)
-            for (ItemStack armoritem: ZombieArmor){
-                LeatherArmorMeta armmeta = (LeatherArmorMeta) armoritem.getItemMeta();
-                armmeta.setColor(Color.YELLOW);
-                armoritem.setItemMeta(armmeta);
-            }
-
-            // Одеваем зомби в броню
-            zombie.getEquipment().setHelmet(ZombieArmor[0]);
-            zombie.getEquipment().setChestplate(ZombieArmor[1]);
-            zombie.getEquipment().setLeggings(ZombieArmor[2]);
-            zombie.getEquipment().setBoots(ZombieArmor[3]);
-         }, 100);
+                zombie.getEquipment().setHelmet(ZombieArmor[0]);
+                zombie.getEquipment().setChestplate(ZombieArmor[1]);
+                zombie.getEquipment().setLeggings(ZombieArmor[2]);
+                zombie.getEquipment().setBoots(ZombieArmor[3]);
+            }, 100L);
         }
-
 
     }
 }
