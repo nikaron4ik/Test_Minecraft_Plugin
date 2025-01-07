@@ -9,6 +9,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.Random;
+
+import static me.nikaron4ik.testPlugin.utils.Utils.color;
 
 public class DamageZombieListener implements Listener {
 
@@ -36,7 +42,16 @@ public class DamageZombieListener implements Listener {
                 } else {
                     zombie.setHealth(remainingHealth);
                 }
+            } else {
+                // Создаём массив со списком эффектов, которые могут выпасть игроку и рандомно выбираем один из этих эффектов
+                PotionEffectType[] effects = {PotionEffectType.BLINDNESS, PotionEffectType.POISON, PotionEffectType.SPEED};
+                PotionEffectType randomEffect = effects[new Random().nextInt(effects.length)];
+
+                // Накладываем выбранный эффект игроку
+                player.addPotionEffect(new PotionEffect(randomEffect, 400, 1));;
+                // (теперь цвета добавляются при помощи цветовых кодов, механика их работы создана в Utils)
+                player.sendMessage(color("&3Вы ударили не того зомби, из-за чего на Вас был наложен эффект &4&l" + randomEffect.getName()));
+                }
             }
         }
     }
-}

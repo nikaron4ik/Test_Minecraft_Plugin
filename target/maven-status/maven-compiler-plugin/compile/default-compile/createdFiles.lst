@@ -1,4 +1,5 @@
 me\nikaron4ik\testPlugin\Main.class
+me\nikaron4ik\testPlugin\utils\Utils.class
 me\nikaron4ik\testPlugin\Events\BreakingGrassOrDirtEvent.class
 me\nikaron4ik\testPlugin\Events\DamageZombieListener.class
 me\nikaron4ik\testPlugin\Events\JoinEvent.class
